@@ -168,7 +168,7 @@ u8 I2C_Read_nByte(u8 DeviceAddr,u16 ReadAddr,u8 *DataArray,u8 n)//硬件I2C读n字节
 	
 	I2C_Cmd( I2Cx,ENABLE );//Clear EV6 by setting again the PE bit
 	
-	I2C_SendData( I2Cx,ReadAddr >> 8 );//写8位寄存器地址
+//	I2C_SendData( I2Cx,ReadAddr >> 8 );//写8位寄存器地址
 	I2C_SendData( I2Cx,ReadAddr );//写8位寄存器地址
 	
 	I2C_Wait = I2C_Wait_Short;//等待时间复位

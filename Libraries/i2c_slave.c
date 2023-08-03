@@ -9,7 +9,10 @@
 
 /*******************************************************************/
 extern volatile uint8_t ADCBuffer[16];
+//u8 read_buf[40];
+//uint8_t cmd_buf[10];
 u8 read_buf[40];
+uint8_t cmd_buf[10];
 
 unsigned char i2c1_mode=I2C1_MODE_WAITING;
 /*---------IIC1---------------*/
@@ -17,7 +20,7 @@ uint8_t  Buffer_Rx_IIC1[40];//????
 uint8_t  Rx_Idx_IIC1=0;//????
 uint8_t  Flag_RcvOK_IIC1 = 0;// ?????? 
 uint8_t  Tx_Idx_IIC1=0;//????
-u8 Response_Message[40];//????
+u8 Response_Message[90];//????
 uint8_t i2c1_ram_adr=0;
 uint8_t i2c1_send_adr=0;
 
@@ -38,7 +41,7 @@ uint8_t get_i2c1_ram(uint8_t adr) {
 //		buffer[2] = 0xE6;
 //		buffer[3] = 0x22;
 
-		return read_buf[adr];
+		return 0xff;
 //	}
 }
 
@@ -119,8 +122,7 @@ void I2C1_EV_IRQHandler(void)
 
   SR1Register = I2C1->SR1;
   SR2Register = I2C1->SR2;
-      I2C_Read_nByte(0x20, 0x8000,read_buf, 40);
-	      I2C_Write_nByte(0x20, 0x0300, 0, 0);
+
     /* I2C1是从机(MSL = 0) */
   if((SR2Register &0x0001) != 0x0001)
   {
@@ -143,18 +145,100 @@ void I2C1_EV_IRQHandler(void)
         Buffer_Rx_IIC1[Rx_Idx_IIC1++] = I2C1->DR;
         SR1Register = 0;
         SR2Register = 0;		
-			if(Buffer_Rx_IIC1[0] == 0xAE)
+			if(Buffer_Rx_IIC1[1] == 0xCC)
 			{
-						Response_Message[0] = 0x26;
-//						Response_Message[1] = 0xE5;
+						Response_Message[0] = 0x48;
+						Response_Message[1] = 0xE5;
 			}
-			else if(Buffer_Rx_IIC1[0] == 0xAF)
+			else if(Buffer_Rx_IIC1[0] == 0x2C)
 			{
-				for(int i = 0; i < 40; i++)
+									Response_Message[0] = 0xAA;
+						Response_Message[1] = 0x55;
+			}
+						else if(Buffer_Rx_IIC1[0] == 0x20)
+			{
+									Response_Message[0] = 0x20;
+						Response_Message[1] = 0x01;
+			}
+									else if(Buffer_Rx_IIC1[0] == 0x11)
+			{
+									Response_Message[0] = 0x0B;
+						Response_Message[1] = 0x00;
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x12)
+			{
+									Response_Message[0] = 0x0E;
+						Response_Message[1] = 0x00;
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x13)
+			{
+									Response_Message[0] = 0x01;
+						Response_Message[1] = 0x00;
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x15)
+			{
+									Response_Message[0] = 0x05;
+						Response_Message[1] = 0x00;
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x16)
+			{
+									Response_Message[0] = 0xAF;
+						Response_Message[1] = 0x00;
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x18)
+			{
+									Response_Message[0] = 0xFE;
+						Response_Message[1] = 0xFF;
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x1B)
+			{
+									Response_Message[0] = 0xC8;
+						Response_Message[1] = 0x00;
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x1C)
+			{
+									Response_Message[0] = 0x49;
+						Response_Message[1] = 0x5A;
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x1D)
+			{
+									Response_Message[0] = 0x3C;
+						Response_Message[1] = 0x00;
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x1E)
+			{
+									Response_Message[0] = 0xFF;
+						Response_Message[1] = 0xFF;
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x1F)
+			{
+									Response_Message[0] = 0x32;
+						Response_Message[1] = 0x00;
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x20)
+			{
+									Response_Message[0] = 0x3C;
+						Response_Message[1] = 0x00;
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x28)
+			{
+									Response_Message[0] = 0x1E;
+						Response_Message[1] = 0x00;
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x29)
+			{
+									Response_Message[0] = 0x1C;
+						Response_Message[1] = 0x00;
+			}
+			else if(Buffer_Rx_IIC1[0] == 0x80)
+			{
+				for(int i = 2; i < 40; i++)
 				{
 					
 						Response_Message[i] = read_buf[i];
-//						Response_Message[1] = 0x08;
+								Response_Message[0] = 0x04;
+
+						Response_Message[1] = 0x08;
 //								Response_Message[2] = 0x03;
 //				Response_Message[3] = 0x04;
 //				Response_Message[4] = 0x05;
@@ -172,74 +256,12 @@ void I2C1_EV_IRQHandler(void)
 				}
 
 			}
-			else if(Buffer_Rx_IIC1[0] == 0xE1)
-			{
-						Response_Message[0] = 0x04;
-						Response_Message[1] = 0x82;
-						Response_Message[2] = 0x07;
-						Response_Message[3] = 0x00;
-			}
-			
-						else if(Buffer_Rx_IIC1[0] == 0xF6)
-			{
-						Response_Message[0] = 0x55;
-						Response_Message[1] = 0x56;
-						Response_Message[2] = 0x32;
-						Response_Message[3] = 0x00;
-										Response_Message[4] = 0x00;
-						Response_Message[5] = 0x00;
-						Response_Message[6] = 0x00;
-						Response_Message[7] = 0x00;
-										Response_Message[8] = 0x11;
-						Response_Message[9] = 0x08;
 
-			}
-									else if(Buffer_Rx_IIC1[0] == 0x02)
+		  else
 			{
-						Response_Message[0] = 0x54;
+						Response_Message[0] = 0x00;
 						Response_Message[1] = 0x00;
-						Response_Message[2] = 0x00;
-						Response_Message[3] = 0x00;
-
-
 			}
-												else if(Buffer_Rx_IIC1[0] == 0x0B)
-			{
-						Response_Message[0] = 0x13;
-						Response_Message[1] = 0x0C;
-						Response_Message[2] = 0x00;
-
-
-			}
-			
-															else if(Buffer_Rx_IIC1[0] == 0xE1)
-			{
-						Response_Message[0] = 0x04;
-						Response_Message[1] = 0x82;
-						Response_Message[2] = 0x07;
-						Response_Message[2] = 0x00;
-
-
-			}
-																		else if(Buffer_Rx_IIC1[0] == 0xE2)
-			{
-						Response_Message[0] = 0x82;
-
-
-
-			}
-																					else if(Buffer_Rx_IIC1[0] == 0xE3)
-			{
-						Response_Message[0] = 0x07;
-
-
-
-			}
-//		  else
-//			{
-//						Response_Message[0] = 0x01;
-//						Response_Message[1] = 0x02;
-//			}
     }
     /* 检测到停止条件(STOPF =1: EV4) */
     if(( SR1Register & 0x0010) == 0x0010)
@@ -247,7 +269,13 @@ void I2C1_EV_IRQHandler(void)
         I2C1->CR1 |= 0x0001;
         SR1Register = 0;
         SR2Register = 0;
-        Flag_RcvOK_IIC1 = 1;            
+        Flag_RcvOK_IIC1 = 1;   
+											cmd_buf[0] = 0xFF;
+		cmd_buf[1] = 0x0B;	
+		      I2C_Write_nByte(0x48, 0xa070, cmd_buf, 2);
+      I2C_Read_nByte(0x48, 0xAE,read_buf, 1);
+
+      I2C_Read_nByte(0x48, 0xAF,read_buf, 40);
     }
 
 
@@ -264,13 +292,15 @@ void I2C1_EV_IRQHandler(void)
         I2C1->DR = Response_Message[Tx_Idx_IIC1++]; 
         SR1Register = 0;
         SR2Register = 0;
+			
     }
     /* 检测到非应答(AF =1: EV3-2) */
     if(( SR1Register & 0x0400) == 0x0400)
     {
         I2C1->SR1 &= 0xFDFF;
         SR1Register = 0;
-        SR2Register = 0;        
+        SR2Register = 0;       
+
     }       
   }
 

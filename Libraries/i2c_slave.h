@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 	
-#define I2CSLAVE_ADDR	0x90 //0x40 >> 1 = 0x20
+#define I2CSLAVE_ADDR	0x40 //0x40 >> 1 = 0x20
 	
 #define ADC_ADDR_START		0x00
 #define ADC_CHANNELS		8

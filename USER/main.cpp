@@ -4,8 +4,9 @@
 
 #define LED_Pin PC13
 #define KEY_Pin PA1
-
-uint8_t cmd_buf[10];
+#define PWM_Pin PA0
+//u8 read_buf[40];
+//uint8_t cmd_buf[10];
 
 void LED_Toogle()
 {
@@ -13,7 +14,7 @@ void LED_Toogle()
     togglePin(LED_Pin);
 }
 void setup() {
-	
+	    PWM_Init(PWM_Pin, 1000, 60);
 		// put your setup code here, to run once:
 		pinMode(LED_Pin, OUTPUT);
     pinMode(KEY_Pin, INPUT_PULLUP);
@@ -27,26 +28,26 @@ void setup() {
 		I2C_Config();
 		I2C1_Slave_init();
 
-		cmd_buf[0] = 0x01;
-		cmd_buf[1] = 0x00;	
-		I2C_Write_nByte(0x20,0x00C0,cmd_buf,2);
-		delay(10);
-//		
-//		I2C_Read_nByte(0x20, 0x00CC,read_buf, 2);
-//		delay(10);			
-//		
-		I2C_Write_nByte(0x20, 0x04C0, cmd_buf, 0);
-		delay(10);						
+//		cmd_buf[0] = 0x01;
+//		cmd_buf[1] = 0x00;	
+//		I2C_Write_nByte(0x20,0x00C0,cmd_buf,2);
+//		delay(10);
+////		
+////		I2C_Read_nByte(0x20, 0x00CC,read_buf, 2);
+////		delay(10);			
+////		
+//		I2C_Write_nByte(0x20, 0x04C0, cmd_buf, 0);
+//		delay(10);						
 
-		cmd_buf[0] = 0x01;
-		cmd_buf[1] = 0x00;		
-		I2C_Write_nByte(0x20, 0x02C0,cmd_buf, 2);						
-		delay(2);
-		
-		cmd_buf[0] = 0x01;
-		cmd_buf[1] = 0x00;		
-		I2C_Write_nByte(0x20, 0x01C0,cmd_buf, 2);						
-		delay(2);
+//		cmd_buf[0] = 0x01;
+//		cmd_buf[1] = 0x00;		
+//		I2C_Write_nByte(0x20, 0x02C0,cmd_buf, 2);						
+//		delay(2);
+//		
+//		cmd_buf[0] = 0x01;
+//		cmd_buf[1] = 0x00;		
+//		I2C_Write_nByte(0x20, 0x01C0,cmd_buf, 2);						
+//		delay(2);
 //		
 //		cmd_buf[0] = 0x01;
 //		cmd_buf[1] = 0x00;		
@@ -85,16 +86,24 @@ void setup() {
 //		cmd_buf[1] = 0x00;		
 //		I2C_Write_nByte(0x20, 0x2601,cmd_buf,  2);						
 //		delay(1);	
-
+        pwmWrite(PWM_Pin, 500);
 
 }
 
 void loop() {
+//				cmd_buf[0] = 0xa0;
+//		cmd_buf[1] = 0x70;	
+//					cmd_buf[0] = 0xFF;
+//		cmd_buf[1] = 0x0B;	
+//		      I2C_Write_nByte(0x48, 0xa070, cmd_buf, 2);
+//      I2C_Read_nByte(0x48, 0xAE,read_buf, 1);
+
+//      I2C_Read_nByte(0x48, 0xAF,read_buf, 40);
     // put your main code here, to run repeatedly:
 //		  I2C_Write_nByte(0x20,0xCC,cmd_buf,3);
 //      I2C_Read_nByte(0x20, 0x8000,read_buf, 40);
 //	      I2C_Write_nByte(0x20, 0x0300,NULL, 0);
-//        delay(16);
+        delay(16);
 
 //	    for(int i = 0; i < 5; i++)
 //    {
