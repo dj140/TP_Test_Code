@@ -5,6 +5,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+//extern u8 read_buf[];
 
 /*************宏定义操作区*************/
 //#define I2C1D//硬件I2C1

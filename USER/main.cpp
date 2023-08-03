@@ -6,7 +6,6 @@
 #define KEY_Pin PA1
 
 uint8_t cmd_buf[10];
-uint8_t read_buf[10];
 
 void LED_Toogle()
 {
@@ -19,30 +18,35 @@ void setup() {
 		pinMode(LED_Pin, OUTPUT);
     pinMode(KEY_Pin, INPUT_PULLUP);
     attachInterrupt(KEY_Pin, LED_Toogle, FALLING);
-	
-//		I2C_Config();
+       digitalWrite(LED_Pin, HIGH);
+        delay(10);
+        digitalWrite(LED_Pin, LOW);
+        delay(100);
+	       digitalWrite(LED_Pin, HIGH);
+        delay(10);
+		I2C_Config();
 		I2C1_Slave_init();
 
-//		cmd_buf[0] = 0x01;
-//		cmd_buf[1] = 0x00;	
-//		I2C_Write_nByte(0x20,0x00C0,cmd_buf,2);
-//		delay(10);
+		cmd_buf[0] = 0x01;
+		cmd_buf[1] = 0x00;	
+		I2C_Write_nByte(0x20,0x00C0,cmd_buf,2);
+		delay(10);
 //		
 //		I2C_Read_nByte(0x20, 0x00CC,read_buf, 2);
 //		delay(10);			
 //		
-//		I2C_Write_nByte(0x20, 0x04C0, cmd_buf, 0);
-//		delay(10);						
+		I2C_Write_nByte(0x20, 0x04C0, cmd_buf, 0);
+		delay(10);						
 
-//		cmd_buf[0] = 0x01;
-//		cmd_buf[1] = 0x00;		
-//		I2C_Write_nByte(0x20, 0x02C0,cmd_buf, 2);						
-//		delay(2);
-//		
-//		cmd_buf[0] = 0x01;
-//		cmd_buf[1] = 0x00;		
-//		I2C_Write_nByte(0x20, 0x01C0,cmd_buf, 2);						
-//		delay(2);
+		cmd_buf[0] = 0x01;
+		cmd_buf[1] = 0x00;		
+		I2C_Write_nByte(0x20, 0x02C0,cmd_buf, 2);						
+		delay(2);
+		
+		cmd_buf[0] = 0x01;
+		cmd_buf[1] = 0x00;		
+		I2C_Write_nByte(0x20, 0x01C0,cmd_buf, 2);						
+		delay(2);
 //		
 //		cmd_buf[0] = 0x01;
 //		cmd_buf[1] = 0x00;		
@@ -88,9 +92,9 @@ void setup() {
 void loop() {
     // put your main code here, to run repeatedly:
 //		  I2C_Write_nByte(0x20,0xCC,cmd_buf,3);
-//      I2C_Read_nByte(0x20, 0x8000,read_buf, 10);
+//      I2C_Read_nByte(0x20, 0x8000,read_buf, 40);
 //	      I2C_Write_nByte(0x20, 0x0300,NULL, 0);
-        delay(10);
+//        delay(16);
 
 //	    for(int i = 0; i < 5; i++)
 //    {

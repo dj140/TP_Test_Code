@@ -5,9 +5,11 @@
 #include "misc.h"
 
 #include "i2c_slave.h"
+#include "I2C_Control.h"
 
 /*******************************************************************/
 extern volatile uint8_t ADCBuffer[16];
+u8 read_buf[40];
 
 unsigned char i2c1_mode=I2C1_MODE_WAITING;
 /*---------IIC1---------------*/
@@ -36,7 +38,7 @@ uint8_t get_i2c1_ram(uint8_t adr) {
 //		buffer[2] = 0xE6;
 //		buffer[3] = 0x22;
 
-		return i2c1_ram[adr];
+		return read_buf[adr];
 //	}
 }
 
@@ -117,7 +119,8 @@ void I2C1_EV_IRQHandler(void)
 
   SR1Register = I2C1->SR1;
   SR2Register = I2C1->SR2;
-
+      I2C_Read_nByte(0x20, 0x8000,read_buf, 40);
+	      I2C_Write_nByte(0x20, 0x0300, 0, 0);
     /* I2C1ÊÇ´Ó»ú(MSL = 0) */
   if((SR2Register &0x0001) != 0x0001)
   {
@@ -140,20 +143,97 @@ void I2C1_EV_IRQHandler(void)
         Buffer_Rx_IIC1[Rx_Idx_IIC1++] = I2C1->DR;
         SR1Register = 0;
         SR2Register = 0;		
-			if(Buffer_Rx_IIC1[1] == 0xCC | Buffer_Rx_IIC1[1] == 0x20)
+			if(Buffer_Rx_IIC1[0] == 0xAE)
 			{
-						Response_Message[0] = 0x48;
-						Response_Message[1] = 0xE5;
+						Response_Message[0] = 0x26;
+//						Response_Message[1] = 0xE5;
 			}
-			else if(Buffer_Rx_IIC1[0] == 0x80)
+			else if(Buffer_Rx_IIC1[0] == 0xAF)
+			{
+				for(int i = 0; i < 40; i++)
+				{
+					
+						Response_Message[i] = read_buf[i];
+//						Response_Message[1] = 0x08;
+//								Response_Message[2] = 0x03;
+//				Response_Message[3] = 0x04;
+//				Response_Message[4] = 0x05;
+//				Response_Message[5] = 0x06;
+//				Response_Message[6] = 0x07;
+//				Response_Message[7] = 0x08;
+//				Response_Message[8] = 0x09;
+//				Response_Message[9] = 0x10;
+//				Response_Message[10] = 0x11;
+//				Response_Message[11] = 0x12;
+//				Response_Message[12] = 0x13;
+//				Response_Message[13] = 0x14;
+//				Response_Message[14] = 0x15;
+//				Response_Message[15] = 0x16;
+				}
+
+			}
+			else if(Buffer_Rx_IIC1[0] == 0xE1)
 			{
 						Response_Message[0] = 0x04;
-						Response_Message[1] = 0x08;
+						Response_Message[1] = 0x82;
+						Response_Message[2] = 0x07;
+						Response_Message[3] = 0x00;
 			}
-			else if(Buffer_Rx_IIC1[0] == 0x2C)
+			
+						else if(Buffer_Rx_IIC1[0] == 0xF6)
 			{
-						Response_Message[0] = 0xAA;
-						Response_Message[1] = 0x55;
+						Response_Message[0] = 0x55;
+						Response_Message[1] = 0x56;
+						Response_Message[2] = 0x32;
+						Response_Message[3] = 0x00;
+										Response_Message[4] = 0x00;
+						Response_Message[5] = 0x00;
+						Response_Message[6] = 0x00;
+						Response_Message[7] = 0x00;
+										Response_Message[8] = 0x11;
+						Response_Message[9] = 0x08;
+
+			}
+									else if(Buffer_Rx_IIC1[0] == 0x02)
+			{
+						Response_Message[0] = 0x54;
+						Response_Message[1] = 0x00;
+						Response_Message[2] = 0x00;
+						Response_Message[3] = 0x00;
+
+
+			}
+												else if(Buffer_Rx_IIC1[0] == 0x0B)
+			{
+						Response_Message[0] = 0x13;
+						Response_Message[1] = 0x0C;
+						Response_Message[2] = 0x00;
+
+
+			}
+			
+															else if(Buffer_Rx_IIC1[0] == 0xE1)
+			{
+						Response_Message[0] = 0x04;
+						Response_Message[1] = 0x82;
+						Response_Message[2] = 0x07;
+						Response_Message[2] = 0x00;
+
+
+			}
+																		else if(Buffer_Rx_IIC1[0] == 0xE2)
+			{
+						Response_Message[0] = 0x82;
+
+
+
+			}
+																					else if(Buffer_Rx_IIC1[0] == 0xE3)
+			{
+						Response_Message[0] = 0x07;
+
+
+
 			}
 //		  else
 //			{
@@ -179,20 +259,6 @@ void I2C1_EV_IRQHandler(void)
 
 //			Response_Message[0] = 0x01;
 //						Response_Message[1] = 0x02;
-				Response_Message[2] = 0x03;
-				Response_Message[3] = 0x04;
-				Response_Message[4] = 0x05;
-				Response_Message[5] = 0x06;
-				Response_Message[6] = 0x07;
-				Response_Message[7] = 0x08;
-				Response_Message[8] = 0x09;
-				Response_Message[9] = 0x10;
-				Response_Message[10] = 0x11;
-				Response_Message[11] = 0x12;
-				Response_Message[12] = 0x13;
-				Response_Message[13] = 0x14;
-				Response_Message[14] = 0x15;
-				Response_Message[15] = 0x16;
 
 
         I2C1->DR = Response_Message[Tx_Idx_IIC1++]; 
