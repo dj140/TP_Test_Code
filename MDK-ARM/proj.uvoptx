@@ -272,12 +272,12 @@
     <File>
       <GroupNumber>2</GroupNumber>
       <FileNumber>3</FileNumber>
-      <FileType>1</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Libraries\i2c_slave.c</PathWithFileName>
-      <FilenameWithoutPath>i2c_slave.c</FilenameWithoutPath>
+      <PathWithFileName>..\Libraries\i2c_slave.cpp</PathWithFileName>
+      <FilenameWithoutPath>i2c_slave.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

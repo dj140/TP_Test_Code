@@ -40,6 +40,8 @@
 #ifndef _WIRE_H_
 #define _WIRE_H_
 
+
+	
 #include "WireBase.h"
 
 /*
@@ -48,14 +50,14 @@
  */
 
 #ifndef SDA_Pin
-#define SDA_Pin PB7
+#define SDA_Pin PB11
 #endif
 
 #ifndef SCL_Pin
-#define SCL_Pin PB6
+#define SCL_Pin PB10
 #endif
 
-#define SOFT_STANDARD 27
+#define SOFT_STANDARD 10
 #define SOFT_FAST 0
 
 #define FULL_SPEED_I2C
@@ -147,5 +149,7 @@ public:
 };
 
 extern TwoWire Wire;
+
+
 
 #endif // _WIRE_H_

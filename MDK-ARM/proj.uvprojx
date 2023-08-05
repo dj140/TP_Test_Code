@@ -399,9 +399,9 @@
               <FilePath>..\Libraries\I2C_Control.c</FilePath>
             </File>
             <File>
-              <FileName>i2c_slave.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Libraries\i2c_slave.c</FilePath>
+              <FileName>i2c_slave.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Libraries\i2c_slave.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -738,5 +738,14 @@
       </file>
     </files>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>proj</LayName>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>
