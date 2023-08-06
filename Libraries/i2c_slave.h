@@ -1,13 +1,15 @@
 /*******************************************************************/
 #ifndef _I2C_SLAVE_H
 #define _I2C_SLAVE_H
+#include "Arduino.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 	
 #define I2CSLAVE_ADDR	0x90 //0x40 >> 1 = 0x20
-	
+extern uint8_t read_buf[40];
+
 #define ADC_ADDR_START		0x00
 #define ADC_CHANNELS		8
 // 0,1 - ADC0

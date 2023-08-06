@@ -4,6 +4,7 @@
 #include "Wire.h"
 
 #define LED_Pin PC13
+#define TP_INT_Pin PA2
 #define KEY_Pin PA1
 #define PWM_Pin PA0
 
@@ -11,12 +12,43 @@
 
 TwoWire Wire(SCL_Pin, SDA_Pin, SOFT_FAST);
 
+uint8_t read_buf[40];
 uint8_t cmd_buf[10];
 
 void LED_Toogle()
 {
-    Serial.println("KEY is pressed!");
-    togglePin(LED_Pin);
+			  #ifdef HW_i2C			
+			  I2C_Read_nByte(0x20, 0x8000,read_buf, 40);
+	      I2C_Write_nByte(0x20, 0x0300, 0, 0);	
+			  #endif
+			
+        #ifdef Soft_i2C			
+				Wire.beginTransmission(0x20); 		
+				Wire.write(0x80);        		
+				Wire.write(0x00);        		    		
+				Wire.endTransmission(); 
+				delay_us(50);
+			
+				Wire.requestFrom(0x20, 40);    
+			
+				while (Wire.available()) 
+				{ 
+						for(uint8_t i = 0; i < 40; i++)
+					{
+					  read_buf[i] = Wire.read(); 
+					}
+				}	
+				
+				Wire.beginTransmission(0x20); 		
+				Wire.write(0x03);        		
+				Wire.write(0x00);        		    		
+				Wire.endTransmission(); 
+
+			  #endif		
+				digitalWrite(TP_INT_Pin, LOW);
+        delay_us(1000);
+			  digitalWrite(TP_INT_Pin, HIGH);
+
 }
 void setup() {
 	   uint8_t read_buf[2];
@@ -26,6 +58,9 @@ void setup() {
 	  pwmWrite(PWM_Pin, 500);
 		// put your setup code here, to run once:
 		pinMode(LED_Pin, OUTPUT);
+		pinMode(TP_INT_Pin, OUTPUT);
+		digitalWrite(TP_INT_Pin, HIGH);
+
     pinMode(KEY_Pin, INPUT_PULLUP);
     attachInterrupt(KEY_Pin, LED_Toogle, FALLING);
 	

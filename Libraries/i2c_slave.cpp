@@ -7,11 +7,10 @@
 #include "i2c_slave.h"
 #include "I2C_Control.h"
 #include "Wire.h"
-
+uint8_t flag = 1;
 #define Soft_i2C
 /*******************************************************************/
 extern volatile uint8_t ADCBuffer[16];
-u8 read_buf[40];
 
 unsigned char i2c1_mode=I2C1_MODE_WAITING;
 /*---------IIC1---------------*/
@@ -132,33 +131,7 @@ void I2C1_EV_IRQHandler(void)
     /* ????????(RXNE = 1: EV2) */
     if((SR1Register & 0x0040) == 0x0040)
     {
-			  #ifdef HW_i2C			
-			  I2C_Read_nByte(0x20, 0x8000,read_buf, 40);
-	      I2C_Write_nByte(0x20, 0x0300, 0, 0);	
-			  #endif
-			
-        #ifdef Soft_i2C			
-				Wire.beginTransmission(0x20); 		
-				Wire.write(0x80);        		
-				Wire.write(0x00);        		    		
-				Wire.endTransmission(); 
-				delay_us(50);
-			
-				Wire.requestFrom(0x20, 40);    
-			
-				while (Wire.available()) 
-				{ 
-						for(uint8_t i = 0; i < 40; i++)
-					{
-					  read_buf[i] = Wire.read(); 
-					}
-				}	
-				
-				Wire.beginTransmission(0x20); 		
-				Wire.write(0x03);        		
-				Wire.write(0x00);        		    		
-				Wire.endTransmission(); 
-			  #endif
+
         Buffer_Rx_IIC1[Rx_Idx_IIC1++] = I2C1->DR;
         SR1Register = 0;
         SR2Register = 0;		
@@ -172,10 +145,31 @@ void I2C1_EV_IRQHandler(void)
 				{
 					
 						Response_Message[i] = 0x00;
-					
+				}
+										if(read_buf[2] == 0x02)		
+										{
+											flag++;
+											if(flag == 0x01)
+											{
 					  //Finger 0 event info (touch / event type / hover / palm / event id[0~3])
-						Response_Message[0] = (read_buf[1]<<4 | 0x7F) & 0xA1;
+						Response_Message[0] = 0xA2;
+																  //Finger 0 xy coordinate (high)  y coordinate (bit 11 ~ bit 8) x coordinate (bit 11 ~ bit 8)
+						Response_Message[1] = (read_buf[13] << 4) | (read_buf[11] & 0x0F);
 					
+					  //Finger 0 x coordinate (bit 7 ~ bit 0)
+						Response_Message[2] = read_buf[10] ;
+					
+					  //Finger 0 y coordinate (bit 7 ~ bit 0)
+						Response_Message[3] = read_buf[12] ;
+
+					  //Finger 0 z (strength)
+					  Response_Message[4] = read_buf[14] ;
+											}
+											else
+											{
+																	  //Finger 0 event info (touch / event type / hover / palm / event id[0~3])
+						Response_Message[0] =  0xA1;									
+									
 					  //Finger 0 xy coordinate (high)  y coordinate (bit 11 ~ bit 8) x coordinate (bit 11 ~ bit 8)
 						Response_Message[1] = (read_buf[7] << 4) | (read_buf[5] & 0x0F);
 					
@@ -187,10 +181,34 @@ void I2C1_EV_IRQHandler(void)
 
 					  //Finger 0 z (strength)
 					  Response_Message[4] = read_buf[8] ;
-
-					  //Finger 1 event info (touch / event type / hover / palm / event id[0~3])					
-						Response_Message[8] = (read_buf[1]<<4 | 0x7F) & 0xA2;
+												flag = 0;
+											}
+										}
+										else{
+						  //Finger 0 event info (touch / event type / hover / palm / event id[0~3])
+						Response_Message[0] = (read_buf[1]<<4 | 0x7F) & 0xA1;									
+									
+					  //Finger 0 xy coordinate (high)  y coordinate (bit 11 ~ bit 8) x coordinate (bit 11 ~ bit 8)
+						Response_Message[1] = (read_buf[7] << 4) | (read_buf[5] & 0x0F);
 					
+					  //Finger 0 x coordinate (bit 7 ~ bit 0)
+						Response_Message[2] = read_buf[4] ;
+					
+					  //Finger 0 y coordinate (bit 7 ~ bit 0)
+						Response_Message[3] = read_buf[6] ;
+
+					  //Finger 0 z (strength)
+					  Response_Message[4] = read_buf[8] ;
+            	}
+					  //Finger 1 event info (touch / event type / hover / palm / event id[0~3])		
+            if(read_buf[2] == 0x02)		
+						{							
+						  Response_Message[8] = 0xA2;
+						}
+						else
+						{
+						  Response_Message[8] = 0x22;						
+						}
 					  //Finger 1 xy coordinate (high)  y coordinate (bit 11 ~ bit 8) x coordinate (bit 11 ~ bit 8)
 						Response_Message[9] = (read_buf[13] << 4) | (read_buf[11] & 0x0F);					
 
@@ -203,12 +221,20 @@ void I2C1_EV_IRQHandler(void)
 					  //Finger 1 z (strength)
 					  Response_Message[12] = read_buf[14] ;
 						
-				}
+				
 
 			}
 			else if(Buffer_Rx_IIC1[0] == 0x0F)
 			{
-						Response_Message[0] = 0x10;
+//					if(read_buf[2] == 0x02)		
+//					{
+//	          Response_Message[0] = 0x10;
+//					}
+//					else
+//					{
+			      Response_Message[0] = 0x08;
+
+//					}
 
 			}
 			else if(Buffer_Rx_IIC1[0] == 0xE1)
@@ -310,12 +336,20 @@ void I2C1_ER_IRQHandler(void) {
   SR2Register = I2C1->SR2;
 
     if(I2C_GetITStatus(I2C1,        I2C_IT_SMBALERT)) {
+			        I2C_ClearITPendingBit(I2C1, I2C_IT_SMBALERT);
+
     }
     else if(I2C_GetITStatus(I2C1, I2C_IT_TIMEOUT)) {
+						        I2C_ClearITPendingBit(I2C1, I2C_IT_TIMEOUT);
+
     } 
     else if(I2C_GetITStatus(I2C1, I2C_IT_PECERR)) {
+									        I2C_ClearITPendingBit(I2C1, I2C_IT_PECERR);
+
     } 
     else if(I2C_GetITStatus(I2C1, I2C_IT_OVR)) {
+			
+									        I2C_ClearITPendingBit(I2C1, I2C_IT_OVR);
 
     }
     else if(I2C_GetITStatus(I2C1, I2C_IT_AF)) {
@@ -323,9 +357,11 @@ void I2C1_ER_IRQHandler(void) {
         I2C_ClearITPendingBit(I2C1, I2C_IT_AF);
     }
     else if(I2C_GetITStatus(I2C1, I2C_IT_ARLO)) {
+        I2C_ClearITPendingBit(I2C1, I2C_IT_ARLO);
 
     }
     else if(I2C_GetITStatus(I2C1, I2C_IT_BERR)) {
+        I2C_ClearITPendingBit(I2C1, I2C_IT_BERR);
 
     }
         I2C1->CR1 |= 0x0001;
